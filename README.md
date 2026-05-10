@@ -44,6 +44,12 @@ Dưới đây là sơ đồ thực thể mối quan hệ (ERD) mô tả cấu tr
 - Đã cài đặt **Node.js** (Phiên bản 18 trở lên).
 - (Tùy chọn) Đã cài đặt **Docker** & **Docker Compose**.
 
+## 💻 Hướng dẫn cài đặt & Khởi chạy
+
+### Điều kiện tiên quyết
+- Đã cài đặt **Node.js** (Phiên bản 18 trở lên).
+- (Tùy chọn) Đã cài đặt **Docker** & **Docker Compose**.
+
 ### Cách 1: Chạy trực tiếp bằng NPM (Chế độ Development)
 
 1. **Cài đặt dependencies**:
@@ -52,3 +58,55 @@ Dưới đây là sơ đồ thực thể mối quan hệ (ERD) mô tả cấu tr
    npm install
    cd server && npm install
    cd ..
+   ```
+
+2. **Cấu hình môi trường**:
+   Tạo file `.env` trong thư mục `server/` (nếu chưa có):
+   ```env
+   JWT_SECRET=your_secret_key
+   PORT=3001
+   ```
+
+3. **Chạy ứng dụng**:
+   Sử dụng lệnh gộp để chạy cả frontend và backend cùng lúc:
+   ```bash
+   npm run dev:full
+   ```
+   - Frontend sẽ chạy tại: `http://localhost:8080`
+   - Backend sẽ chạy tại: `http://localhost:3001`
+
+### Cách 2: Chạy bằng Docker Compose (Khuyên dùng cho Production/Demo)
+
+Dự án đã được đóng gói sẵn sàng để chạy trong môi trường container.
+
+1. **Khởi chạy container**:
+   Tại thư mục gốc, chạy lệnh:
+   ```bash
+   docker-compose up --build -d
+   ```
+
+2. **Truy cập**:
+   - Ứng dụng sẽ chạy tại: `http://localhost:8080`
+   - Dữ liệu SQLite được lưu trữ bền vững tại file `server/database.sqlite` trên máy của bạn.
+
+### Cách 3: Build và Chạy thủ công (Production)
+
+1. **Build Frontend**:
+   ```bash
+   npm run build
+   ```
+   Các file tĩnh sẽ nằm trong thư mục `dist/`.
+
+2. **Chạy Backend**:
+   ```bash
+   cd server
+   node index.js
+   ```
+
+## 📂 Cấu trúc thư mục
+
+- `/src`: Mã nguồn Frontend (React).
+- `/server`: Mã nguồn Backend (Node.js).
+- `/server/routes`: Chứa logic xử lý các API.
+- `/server/database.sqlite`: File cơ sở dữ liệu (tự động tạo khi chạy lần đầu).
+- `docker-compose.yml`: File cấu hình Docker.
