@@ -102,7 +102,10 @@ Dự án đã được đóng gói sẵn sàng để chạy trong môi trường
    cd server
    node index.js
    ```
+## Tài khoản Admin đăng nhập
 
+``` Tên tài khoản: admin@example.com
+    Mật khẩu: adminpassword ```
 ## 📂 Cấu trúc thư mục
 
 - `/src`: Mã nguồn Frontend (React).
