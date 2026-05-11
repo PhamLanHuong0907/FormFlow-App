@@ -102,10 +102,11 @@ Dự án đã được đóng gói sẵn sàng để chạy trong môi trường
    cd server
    node index.js
    ```
-## Tài khoản Admin đăng nhập
+## 🔐 Tài khoản Admin đăng nhập (Test)
 
-``` Tên tài khoản: admin@example.com
-    Mật khẩu: adminpassword ```
+- **Email:** `admin@example.com`
+- **Mật khẩu:** `adminpassword`
+
 ## 📂 Cấu trúc thư mục
 
 - `/src`: Mã nguồn Frontend (React).
