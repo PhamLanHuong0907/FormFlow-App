@@ -1,4 +1,4 @@
-# FormFlow - Hệ thống Quản lý Form Năng động
+# FormFlow - Hệ thống Quản lý Form 
 
 FormFlow là một ứng dụng web hiện đại cho phép tạo, quản lý và thu thập dữ liệu từ các biểu mẫu (forms) một cách linh hoạt. Dự án được thiết kế để phục vụ việc tạo form khảo sát, báo cáo nội bộ cho doanh nghiệp với trải nghiệm người dùng mượt mà.
 
