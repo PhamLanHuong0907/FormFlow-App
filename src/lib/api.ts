@@ -1,4 +1,8 @@
-const API_URL = 'http://localhost:3001/api';
+// Lấy URL từ biến môi trường VITE_API_URL nếu có
+// - Môi trường Dev (nếu không cấu hình VITE_API_URL): mặc định 'http://localhost:3001/api'
+// - Môi trường Production (Docker/Nginx/cùng domain): mặc định '/api'
+const RAW_API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:3001/api' : '/api');
+const API_URL = RAW_API_URL.replace(/\/+$/, '');
 
 async function request(path: string, options: RequestInit = {}) {
   const token = localStorage.getItem('token');
@@ -8,7 +12,8 @@ async function request(path: string, options: RequestInit = {}) {
     ...options.headers,
   };
 
-  const response = await fetch(`${API_URL}${path}`, { ...options, headers });
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  const response = await fetch(`${API_URL}${cleanPath}`, { ...options, headers });
   
   if (!response.ok) {
     const error = await response.json();
@@ -24,3 +29,4 @@ export const api = {
   put: (path: string, body: any) => request(path, { method: 'PUT', body: JSON.stringify(body) }),
   delete: (path: string) => request(path, { method: 'DELETE' }),
 };
+
