@@ -12,15 +12,38 @@ const PORT = process.env.PORT || 3001;
 // Run database seeding
 seed().catch(err => console.error('Seeding failed:', err));
 
+// CORS Middleware toàn diện: xử lý preflight OPTIONS và cấp header cho mọi origin
+app.use((req, res, next) => {
+  const origin = req.headers.origin || '*';
+  res.setHeader('Access-Control-Allow-Origin', origin);
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  next();
+});
+
 app.use(cors());
 app.use(express.json());
 
-// Routes
+// Routes (Hỗ trợ cả có /api và không có /api để tránh 404)
 app.use('/api/auth', authRoutes);
-app.use('/api/forms', formsRoutes);
-app.use('/api/submissions', submissionsRoutes);
+app.use('/auth', authRoutes);
 
-// 404 Handler for API (matches anything starting with /api that wasn't handled above)
+app.use('/api/forms', formsRoutes);
+app.use('/forms', formsRoutes);
+
+app.use('/api/submissions', submissionsRoutes);
+app.use('/submissions', submissionsRoutes);
+
+// Health check endpoint
+app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
+app.get('/health', (req, res) => res.json({ status: 'ok' }));
+
+// 404 Handler for API
 app.use('/api', (req, res) => {
   res.status(404).json({ error: `Path not found: ${req.originalUrl}` });
 });
