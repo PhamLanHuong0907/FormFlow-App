@@ -32,23 +32,36 @@ router.post('/register', async (req, res) => {
 });
 
 router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-  
-  const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
-  if (!user || !(await bcrypt.compare(password, user.password))) {
-    return res.status(401).json({ error: 'Invalid email or password' });
+  try {
+    const { email, password } = req.body || {};
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+    
+    const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+    
+    const roleData = db.prepare('SELECT role FROM user_roles WHERE user_id = ?').get(user.id);
+    const token = jwt.sign({ id: user.id, email: user.email, role: roleData?.role }, JWT_SECRET, { expiresIn: '7d' });
+    
+    res.json({ token, user: { id: user.id, email: user.email }, role: roleData?.role });
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ error: 'Database or server error: ' + err.message });
   }
-  
-  const roleData = db.prepare('SELECT role FROM user_roles WHERE user_id = ?').get(user.id);
-  const token = jwt.sign({ id: user.id, email: user.email, role: roleData?.role }, JWT_SECRET, { expiresIn: '7d' });
-  
-  res.json({ token, user: { id: user.id, email: user.email }, role: roleData?.role });
 });
 
 router.get('/me', authMiddleware, (req, res) => {
-  const profile = db.prepare('SELECT * FROM profiles WHERE id = ?').get(req.user.id);
-  const roleData = db.prepare('SELECT role FROM user_roles WHERE user_id = ?').get(req.user.id);
-  res.json({ user: profile, role: roleData?.role });
+  try {
+    const profile = db.prepare('SELECT * FROM profiles WHERE id = ?').get(req.user.id);
+    const roleData = db.prepare('SELECT role FROM user_roles WHERE user_id = ?').get(req.user.id);
+    res.json({ user: profile, role: roleData?.role });
+  } catch (err) {
+    console.error('Me error:', err);
+    res.status(500).json({ error: 'Database error: ' + err.message });
+  }
 });
 
 module.exports = router;

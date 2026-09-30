@@ -1,11 +1,44 @@
 const Database = require('better-sqlite3');
 const path = require('path');
+const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 
-const db = new Database(path.join(__dirname, 'database.sqlite'));
+function initDatabase() {
+  const defaultPath = path.join(__dirname, 'database.sqlite');
+  let finalPath = defaultPath;
+
+  // Trên Vercel hoặc môi trường Serverless (thư mục code là read-only)
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    const tmpPath = path.join('/tmp', 'database.sqlite');
+    try {
+      if (!fs.existsSync(tmpPath)) {
+        if (fs.existsSync(defaultPath)) {
+          fs.copyFileSync(defaultPath, tmpPath);
+        }
+      }
+      finalPath = tmpPath;
+    } catch (err) {
+      console.error('Lỗi copy database sang /tmp:', err.message);
+    }
+  }
+
+  try {
+    return new Database(finalPath);
+  } catch (err) {
+    console.warn(`Không thể mở ${finalPath}, chuyển sang /tmp:`, err.message);
+    const fallbackPath = path.join('/tmp', 'database.sqlite');
+    return new Database(fallbackPath);
+  }
+}
+
+const db = initDatabase();
 
 // Enable foreign keys
-db.pragma('foreign_keys = ON');
+try {
+  db.pragma('foreign_keys = ON');
+} catch (e) {
+  console.warn('Pragma error:', e.message);
+}
 
 // Create tables
 db.exec(`
